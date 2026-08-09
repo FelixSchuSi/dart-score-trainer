@@ -269,6 +269,7 @@ const FLASH_MS = 800;
 let target = 0;
 let darts = [];
 let locked = false; // ignore clicks while the board is flashing
+let failedAttempts = 0; // consecutive busts / outs of darts on the current target
 
 const boardContainer = document.getElementById('board-container');
 const targetEl = document.getElementById('target');
@@ -338,6 +339,7 @@ function handleDart(label) {
       flash('green', () => {
         darts = [];
         target = randomTarget();
+        failedAttempts = 0;
         statusEl.textContent = '';
         routeEl.textContent = '';
         render();
@@ -357,6 +359,10 @@ function handleDart(label) {
   // Fail: bust (overshot, landed on 1, or 0 without a double) or out of darts
   if (remaining < 2 || darts.length === 3) {
     statusEl.textContent = remaining < 2 ? 'Bust!' : 'Out of darts!';
+    failedAttempts++;
+    if (failedAttempts >= 3) {
+      showRoute();
+    }
     flash('red', () => {
       darts = [];
       render();
