@@ -264,18 +264,24 @@ const ROUTES = {
 };
 
 const TARGETS = Object.keys(ROUTES).map(Number);
+const MIN_TARGET = Math.min(...TARGETS); // 41
+const MAX_TARGET = Math.max(...TARGETS); // 170
 const FLASH_MS = 800;
 
 let target = 0;
 let darts = [];
 let locked = false; // ignore clicks while the board is flashing
 let failedAttempts = 0; // consecutive busts / outs of darts on the current target
+let minTarget = MIN_TARGET;
+let maxTarget = MAX_TARGET;
 
 const boardContainer = document.getElementById('board-container');
 const targetEl = document.getElementById('target');
 const dartsEl = document.getElementById('darts');
 const statusEl = document.getElementById('status');
 const routeEl = document.getElementById('route');
+const minInput = document.getElementById('min-target');
+const maxInput = document.getElementById('max-target');
 
 function dartValue(label) {
   if (label === 'BULL') return 50;
@@ -290,8 +296,42 @@ function isDouble(label) {
 }
 
 function randomTarget() {
-  return TARGETS[Math.floor(Math.random() * TARGETS.length)];
+  const pool = TARGETS.filter((t) => t >= minTarget && t <= maxTarget);
+  return pool[Math.floor(Math.random() * pool.length)];
 }
+
+// Restrict which checkouts can be drawn. If the current target falls outside
+// the new range, immediately draw a fresh one and reset the visit.
+function applyRange(min, max) {
+  minTarget = min;
+  maxTarget = max;
+  minInput.value = min;
+  maxInput.value = max;
+  if (target < min || target > max) {
+    darts = [];
+    failedAttempts = 0;
+    statusEl.textContent = '';
+    routeEl.textContent = '';
+    target = randomTarget();
+    render();
+  }
+}
+
+function readRangeInputs() {
+  let min = Number(minInput.value) || MIN_TARGET;
+  let max = Number(maxInput.value) || MAX_TARGET;
+  min = Math.max(MIN_TARGET, Math.min(MAX_TARGET, min));
+  max = Math.max(MIN_TARGET, Math.min(MAX_TARGET, max));
+  if (min > max) [min, max] = [max, min];
+  applyRange(min, max);
+}
+
+minInput.addEventListener('change', readRangeInputs);
+maxInput.addEventListener('change', readRangeInputs);
+
+document.querySelectorAll('.quick-select').forEach((btn) => {
+  btn.addEventListener('click', () => applyRange(Number(btn.dataset.min), Number(btn.dataset.max)));
+});
 
 function render() {
   targetEl.textContent = target;
