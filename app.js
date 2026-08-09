@@ -1,14 +1,16 @@
-// Dartboard rendered as SVG, using regulation proportions (radii in mm).
+// Dartboard rendered as SVG. Radii are based on regulation proportions (mm),
+// but the double/triple rings and the bulls are enlarged to make them easier
+// to tap, especially on touch screens.
 // Segment order clockwise from the top (20 at 12 o'clock).
 const NUMBERS = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
 
 const R = {
-  bullInner: 6.35,   // 50
-  bullOuter: 15.9,   // 25
-  tripleInner: 99,
-  tripleOuter: 107,
-  doubleInner: 162,
-  doubleOuter: 170,
+  bullInner: 10,     // 50 (regulation: 6.35)
+  bullOuter: 22,     // 25 (regulation: 15.9)
+  tripleInner: 96,   // (regulation: 99)
+  tripleOuter: 110,  // (regulation: 107)
+  doubleInner: 159,  // (regulation: 162)
+  doubleOuter: 173,  // (regulation: 170)
   numbers: 195,      // where the number labels sit
   surround: 212,     // outer edge of the board surround
 };
